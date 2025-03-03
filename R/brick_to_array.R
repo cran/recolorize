@@ -18,14 +18,21 @@ brick_to_array <- function(raster_brick) {
   r <- raster_brick
 
   # get non-background pixels (> 0) and set them to have alpha = 1
-  r_alpha <- raster::merge(r > 0)
+  r[is.na(r)] <- 0
+  r_alpha <- r$layer.1 > 0 | r$layer.2 > 0 | r$layer.3 > 0
 
   # adjust negative values
   r[r < 0] <- 0
 
   # add alpha layer
   # divide r by 255 so it's in a 0-1 range
-  r2 <- raster::addLayer(r / 255, r_alpha)
+  # idk what's going on but here's a weird failsafe:
+  r_range <- max(raster::maxValue(r)) - min(raster::minValue(r))
+  if (r_range > 255) {
+    r2 <- raster::addLayer(r / r_range, r_alpha)
+  } else {
+    r2 <- raster::addLayer(r / 255, r_alpha)
+  }
 
   # convert to an array
   r3 <- raster::as.array(r2)

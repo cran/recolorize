@@ -4,7 +4,7 @@
 #' similar provided color. Useful for producing a set of images with identical colors.
 #'
 #' @param img Path to the image (a character vector) or a 3D image array as read
-#'   in by \code{\link[png]{readPNG}} \code{{readImage}}.
+#'   in by [png::readPNG()] \code{{readImage}}.
 #' @param centers Colors to map to, as an n x 3 matrix (rows = colors,
 #'   columns = channels).
 #' @param adjust_centers Logical. After pixel assignment, should the returned
@@ -63,6 +63,7 @@
 #'
 #' @examples
 #'
+#' \donttest{
 #' # RGB extremes (white, black, red, green, blue, yellow, magenta, cyan)
 #' ctrs <- matrix(c(1, 1, 1,
 #'                  0, 0, 0,
@@ -98,7 +99,7 @@
 #' fulgidissma_ocellata <- recolorize::imposeColors(fulgidissima,
 #'                        ocellata_colors$centers,
 #'                        adjust_centers = FALSE)
-#'
+#' }
 #' @export
 imposeColors <- function(img, centers,
                            adjust_centers = TRUE,

@@ -1,6 +1,6 @@
 Package: recolorize
 Title: Color-Based Image Segmentation
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(given = "Hannah",
            family = "Weller",
@@ -20,15 +20,18 @@ Description: Automatic, semi-automatic, and manual functions for
 License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.1
 Imports: imager, stats, png, pavo, grDevices, graphics, mgcv,
         colorRamps, plotfunctions, abind, raster, plot3D
-Depends: R (>= 3.50)
-Suggests: knitr, rmarkdown, sp, smoothr
+Depends: R (>= 4.1.0)
+Suggests: knitr, rmarkdown, sf, smoothr, clue, spatstat.geom, methods
 VignetteBuilder: knitr
+URL: https://hiweller.github.io/recolorize/,
+        https://github.com/hiweller/recolorize
+BugReports: https://github.com/hiweller/recolorize/issues
 NeedsCompilation: no
-Packaged: 2021-12-06 23:04:15 UTC; hanna
+Packaged: 2025-03-03 19:39:20 UTC; hannahwe
 Author: Hannah Weller [aut, cre] (<https://orcid.org/0000-0002-5252-4282>)
 Maintainer: Hannah Weller <hannahiweller@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-12-07 08:20:05 UTC
+Date/Publication: 2025-03-03 21:00:03 UTC

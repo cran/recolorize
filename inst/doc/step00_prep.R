@@ -1,5 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
+  dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -7,12 +8,12 @@ knitr::opts_chunk$set(
   strip.white = TRUE
 )
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 par(mar = c(0, 0, 2, 0))
 
-## ---- echo=F,fig.with = 5,message=F,fig.align='center'------------------------
+## ----echo=F,fig.with = 5,message=F,fig.align='center'-------------------------
 library(recolorize)
 ful <- readImage(system.file("extdata/fulgidissima.png", package = "recolorize"))
 ful_blur <- blurImage(ful, "blur_anisotropic", amplitude = 10, sharpness = 0.5, plotting = FALSE)
@@ -34,6 +35,6 @@ title(main = "map 1    ", font.main = 1)
 plotImageArray(recoloredImage(ful3))
 title(main="map 2    ", font.main = 1)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

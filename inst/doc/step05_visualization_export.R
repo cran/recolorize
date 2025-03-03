@@ -1,5 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
+  dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -7,11 +8,11 @@ knitr::opts_chunk$set(
   strip.white = TRUE
 )
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 
-## ---- fig.width = 5, fig.height=4---------------------------------------------
+## ----fig.width = 5, fig.height=4----------------------------------------------
 library(recolorize)
 img <- system.file("extdata/ephippigera.png", package = "recolorize")
 rc <- recolorize2(img, plotting = FALSE)
@@ -29,10 +30,10 @@ dist_original <- imDist(readImage(img),
 imHeatmap(dist_original, range = c(0, sqrt(3)),
           main = "Scaled distances")
 
-## ---- fig.width = 4, fig.height=3---------------------------------------------
+## ----fig.width = 4, fig.height=3----------------------------------------------
 hist(dist_original, main = "sRGB distances", xlab = "Distance")
 
-## ---- fig.width = 5, fig.height=4.5-------------------------------------------
+## ----fig.width = 5, fig.height=4.5--------------------------------------------
 img <- system.file("extdata/corbetti.png", package = "recolorize")
 rc <- recolorize2(img, cutoff = 45, plotting = FALSE)
 
@@ -47,23 +48,23 @@ for (i in 1:length(layers)) {
 }
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # export color map
-#  recolorize_to_png(rc, filename = "corbetti_recolored.png")
-#  
-#  # export individual layers from splitByColor
-#  for (i in 1:length(layers)) {
-#    png::writePNG(layers[[i]],
-#                  target = paste0("layer_", i, ".png"))
-#  }
+# # export color map
+# recolorize_to_png(rc, filename = "corbetti_recolored.png")
+# 
+# # export individual layers from splitByColor
+# for (i in 1:length(layers)) {
+#   png::writePNG(layers[[i]],
+#                 target = paste0("layer_", i, ".png"))
+# }
 
 ## ----eval=F-------------------------------------------------------------------
-#  # convert to a classify object
-#  as_classify <- classify_recolorize(rc, imgname = "corbetti")
-#  adj_analysis <- pavo::adjacent(as_classify, xscale = 10)
-#  
-#  # run adjacent directly using human perceptual color distances (i.e. no spectral data - proceed with caution)
-#  adj_human <- recolorize_adjacency(rc)
+# # convert to a classify object
+# as_classify <- classify_recolorize(rc, imgname = "corbetti")
+# adj_analysis <- pavo::adjacent(as_classify, xscale = 10)
+# 
+# # run adjacent directly using human perceptual color distances (i.e. no spectral data - proceed with caution)
+# adj_human <- recolorize_adjacency(rc)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

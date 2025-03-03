@@ -1,5 +1,5 @@
-## ---- include = FALSE---------------------------------------------------------
-knitr::opts_chunk$set(
+## ----include = FALSE----------------------------------------------------------
+knitr::opts_chunk$set(dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -10,11 +10,11 @@ knitr::opts_chunk$set(
 ## ----setup, echo=F------------------------------------------------------------
 par(mar = rep(0, 4))
 
-## ---- echo = FALSE, fig.width=6, fig.height=3.5-------------------------------
+## ----echo = FALSE, fig.width=6, fig.height=3.5--------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 img <- system.file("extdata/corbetti.png", package = "recolorize")
-rc <- suppressMessages(recolorize2(img, 
+rc <- suppressMessages(recolorize2(img,
                                   cutoff = 45, plotting = FALSE))
 v <- system.file("extdata/msc/corbetti_vector.rds", package = "recolorize")
 v <- readRDS(v)
@@ -25,28 +25,29 @@ title("Original    ", line = 1, font.main = 1, cex.main = 1.2)
 plotImageArray(recoloredImage(rc))
 title("Color map (bitmap)    ", line = 1, font.main = 1, cex.main = 1.2)
 par(mar = c(1, 1, 3, 1))
-plot(v)
+# plot(v)
 title("Color map (vector)", font.main = 1, cex.main = 1.2)
 plotColorPalette(rc$centers, rc$sizes, horiz = F)
 rm(v, rc)
 
-## ---- eval=F------------------------------------------------------------------
-#  library(recolorize)
-#  
-#  # get the path to the image (comes with the package, so we use system.file):
-#  img <- system.file("extdata/corbetti.png", package = "recolorize")
-#  
-#  # fit a color map (only provided parameter is a color similarity cutoff)
-#  recolorize_obj <- recolorize2(img, cutoff = 45)
+## ----eval=F-------------------------------------------------------------------
+# library(recolorize)
+# 
+# # get the path to the image (comes with the package, so we use system.file):
+# img <- system.file("extdata/corbetti.png", package = "recolorize")
+# 
+# # fit a color map (only provided parameter is a color similarity cutoff)
+# recolorize_obj <- recolorize2(img, cutoff = 45)
 
-## ---- fig.width=4-------------------------------------------------------------
+## ----fig.width=4--------------------------------------------------------------
+library(recolorize)
 init_fit <- recolorize(img, method = "hist", bins = 2, 
                        color_space = "sRGB")
 
-## ---- fig.width=4-------------------------------------------------------------
+## ----fig.width=4--------------------------------------------------------------
 refined_fit <- recluster(init_fit, cutoff = 45)
 
-## ---- fig.width = 4-----------------------------------------------------------
+## ----fig.width = 4------------------------------------------------------------
 final_fit <- editLayer(refined_fit, 3,
                         operation = "fill", px_size = 4)
 
@@ -88,14 +89,14 @@ attributes(final_fit)
 ## -----------------------------------------------------------------------------
 final_fit$call
 
-## ---- fig.width = 2-----------------------------------------------------------
+## ----fig.width = 2------------------------------------------------------------
 # type = raster gets you a raster (like original_img); type = array gets you an 
 # image array
 recolored_img <- recoloredImage(final_fit, type = "array")
 par(mar = rep(0, 4))
 plotImageArray(recolored_img)
 
-## ---- fig.width = 2-----------------------------------------------------------
+## ----fig.width = 2------------------------------------------------------------
 colors <- c("navy", "lightblue", "blueviolet",
             "turquoise", "slateblue", "royalblue", 
             "aquamarine", "dodgerblue")
@@ -106,6 +107,6 @@ blue_beetle <- constructImage(final_fit$pixel_assignments,
 par(mar = rep(0, 4))
 plotImageArray(blue_beetle)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

@@ -1,5 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
+  dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -7,7 +8,7 @@ knitr::opts_chunk$set(
   strip.white = TRUE
 )
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 
@@ -20,7 +21,7 @@ corbetti <- system.file("extdata/corbetti.png", package = "recolorize")
 # cluster using defaults
 recolorize_defaults <- recolorize(img = corbetti)
 
-## ---- fig.width=6, fig.height=2.5, echo=F, message=F--------------------------
+## ----fig.width=6, fig.height=2.5, echo=F, message=F---------------------------
 img <- readImage(corbetti)
 pix <- backgroundIndex(img, 
                        bg_condition = backgroundCondition(transparent = TRUE,
@@ -73,7 +74,7 @@ plot_colors(pix, color_space = "Lab",
             zlab = "b (yellow-blue)", 
             alpha = 0.8, theta = th + 180)
 
-## ---- fig.width = 3.5, fig.height=3.5-----------------------------------------
+## ----fig.width = 3.5, fig.height=3.5------------------------------------------
 # fit 64 colors, both ways
 r_hist <- recolorize(corbetti, method = "hist", bins = 3, plotting = FALSE)
 r_k <- recolorize(corbetti, method = "k", n = 37, plotting = FALSE)
@@ -90,7 +91,7 @@ plotColorClusters(r_k$centers, r_k$sizes, scaling = 30,
                   main = "k-means clustering",
                   xlim = 0:1, ylim = 0:1, zlim = 0:1)
 
-## ---- fig.height=3------------------------------------------------------------
+## ----fig.height=3-------------------------------------------------------------
 k_list <- lapply(1:3, function(i) recolorize(corbetti, "k", n = 10, plotting = F))
 
 layout(1:3)
@@ -99,7 +100,7 @@ plotColorPalette(k_list[[1]]$centers, k_list[[1]]$sizes)
 plotColorPalette(k_list[[2]]$centers, k_list[[2]]$sizes)
 plotColorPalette(k_list[[3]]$centers, k_list[[3]]$sizes)
 
-## ---- fig.width = 4-----------------------------------------------------------
+## ----fig.width = 4------------------------------------------------------------
 # we can go from an unacceptable to an acceptable color map in 
 # CIE Lab space by adding a single additional bin in the luminance channel:
 r_hist_2 <- recolorize(corbetti, method = "hist", color_space = "Lab", 
@@ -109,7 +110,7 @@ r_hist_322 <- recolorize(corbetti,
                      bins = c(3, 2, 2))
 
 
-## ---- fig.width = 4-----------------------------------------------------------
+## ----fig.width = 4------------------------------------------------------------
 im1 <- system.file("extdata/ocellata.png", package = "recolorize")
 im2 <- system.file("extdata/ephippigera.png", package = "recolorize")
 
@@ -121,6 +122,6 @@ fit1 <- recolorize(im1)
 # the imposed colors to better match the raw image
 fit2 <- imposeColors(im2, fit1$centers, adjust_centers = FALSE)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

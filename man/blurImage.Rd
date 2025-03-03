@@ -4,7 +4,12 @@
 \alias{blurImage}
 \title{Blur an image}
 \usage{
-blurImage(img, blur_function = "medianblur", ..., plotting = TRUE)
+blurImage(
+  img,
+  blur_function = c("medianblur", "isoblur", "blur_anisotropic", "boxblur", "boxblur_xy"),
+  ...,
+  plotting = TRUE
+)
 }
 \arguments{
 \item{img}{An image array, as read in by \link[png:readPNG]{png::readPNG} or \link{readImage}.}
@@ -33,22 +38,23 @@ specify: \link[imager:isoblur]{imager::isoblur}, \link[imager:medianblur]{imager
 \code{blur_anisotropic} functions are best for preserving edges.
 }
 \examples{
+
+\donttest{
 img_path <- system.file("extdata/fulgidissima.png", package = "recolorize")
 img <- readImage(img_path)
 median_img <- blurImage(img, "medianblur", n = 5, threshold = 0.5)
 anisotropic_img <- blurImage(img, "blur_anisotropic",
                              amplitude = 5, sharpness = 0.1)
-boxblur_img <- blurImage(img, "boxblur", boxsize = 5)
 
 # save current graphical parameters:
 current_par <- graphics::par(no.readonly = TRUE)
-graphics::layout(matrix(1:4, nrow = 1))
+graphics::layout(matrix(1:3, nrow = 1))
 
 plotImageArray(img, "original")
 plotImageArray(median_img, "median")
 plotImageArray(anisotropic_img, "anisotropic")
-plotImageArray(boxblur_img, "boxblur")
 
 # and reset:
 graphics::par(current_par)
+}
 }

@@ -19,31 +19,33 @@
 #' `blur_anisotropic` functions are best for preserving edges.
 #'
 #' @examples
+#'
+#' \donttest{
 #' img_path <- system.file("extdata/fulgidissima.png", package = "recolorize")
 #' img <- readImage(img_path)
 #' median_img <- blurImage(img, "medianblur", n = 5, threshold = 0.5)
 #' anisotropic_img <- blurImage(img, "blur_anisotropic",
 #'                              amplitude = 5, sharpness = 0.1)
-#' boxblur_img <- blurImage(img, "boxblur", boxsize = 5)
 #'
 #' # save current graphical parameters:
 #' current_par <- graphics::par(no.readonly = TRUE)
-#' graphics::layout(matrix(1:4, nrow = 1))
+#' graphics::layout(matrix(1:3, nrow = 1))
 #'
 #' plotImageArray(img, "original")
 #' plotImageArray(median_img, "median")
 #' plotImageArray(anisotropic_img, "anisotropic")
-#' plotImageArray(boxblur_img, "boxblur")
 #'
 #' # and reset:
 #' graphics::par(current_par)
+#' }
 #' @export
-blurImage <- function(img, blur_function = "medianblur",
+blurImage <- function(img,
+                      blur_function = c("medianblur", "isoblur",
+                                        "blur_anisotropic", "boxblur",
+                                        "boxblur_xy"),
                       ..., plotting = TRUE) {
 
-  blur_function <- match.arg(blur_function,
-                             c("isoblur", "blur_anisotropic",
-                               "boxblur", "boxblur_xy", "medianblur"))
+  blur_function <- match.arg(blur_function)
   c_img <- array_to_cimg(img)
   blur_img <- switch(blur_function,
                      isoblur = imager::isoblur(c_img, ...),

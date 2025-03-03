@@ -1,7 +1,7 @@
 #' Read in an image as a 3D array
 #'
 #' Reads in and processes an image as a 3D array. Extremely simple wrapper for
-#' \code{\link[imager]{load.image}}, but it strips the depth channel (resulting
+#' [imager::load.image()], but it strips the depth channel (resulting
 #' in a 3D, not 4D, array). This will probably change.
 #'
 #' @param img_path Path to the image (a string).
@@ -22,10 +22,10 @@ readImage <- function(img_path, resize = NULL, rotate = NULL) {
 
   # read in image
   img_ext <- tolower(tools::file_ext(img_path))
-  if (img_ext %in% c("jpeg", "jpg", "png", "bmp")) {
+  if (img_ext %in% c("jpeg", "jpg", "png", "bmp", "tif", "tiff")) {
     img <- imager::load.image(img_path)
   } else {
-    stop("Image must be either JPG, PNG, or BMP")
+    stop("Image must be either JPG, PNG, TIFF, or BMP")
   }
 
   # resize if specified
@@ -51,7 +51,16 @@ readImage <- function(img_path, resize = NULL, rotate = NULL) {
   # this is a bit slow!
   # another reason to switch to all cimg objects!
   # imager is just not friendly to me
-  temp[ , , ] <- apply(temp, 3, function(mat) mat[ , ncol(mat):1, drop=FALSE])
+  if (length(dim(temp)) == 3) {
+    temp[ , , ] <- apply(temp, 3, function(mat) mat[ , ncol(mat):1, drop=FALSE])
+  } else if (length(dim(temp)) == 2) {
+    temp <- temp[ , ncol(temp):1, drop=FALSE]
+  }
+
+  if (max(temp) > 1) {
+    temp <- temp / max(temp)
+  }
+
   img <- temp
   rm(temp)
 

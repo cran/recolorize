@@ -36,10 +36,12 @@ dominant colors are used to re-fit the image. Despite being
 straightforward, this can be a surprisingly useful function.
 }
 \examples{
+\donttest{
 img <- system.file("extdata/fulgidissima.png", package = "recolorize")
 init_fit <- recolorize(img, bins = 3)
 thresh_fit <- thresholdRecolor(init_fit, pct = 0.1)
 
 # if you take it too far, you just get one color back:
 thresh_fit_oops <- thresholdRecolor(init_fit, pct = 1)
+}
 }

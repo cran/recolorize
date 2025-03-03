@@ -4,7 +4,7 @@
 #' then recolors that image to the simplified color scheme.
 #'
 #' @param img Path to the image (a character vector) or a 3D image array as read
-#'   in by \code{\link[png]{readPNG}} \code{{readImage}}.
+#'   in by [png::readPNG()] \code{{readImage}}.
 #' @param method Method for clustering image colors. One of either `histogram`
 #'   or `kmeans`. See details.
 #' @param n If `method = "kmeans"`, the number of color clusters to fit.
@@ -12,7 +12,7 @@
 #'   channel (if a single number is provided) OR a vector of length 3 with the
 #'   number of bins for each channel.
 #' @param color_space Color space in which to minimize distances, passed to
-#'   \code{\link{grDevices}{convertColor}}. One of "sRGB", "Lab", or "Luv".
+#'   \code{[grDevices]{convertColor}}. One of "sRGB", "Lab", or "Luv".
 #'   Default is "Lab", a perceptually uniform (for humans) color space.
 #' @param ref_white Reference white for converting to different color spaces.
 #'   D65 (the default) corresponds to standard daylight.
@@ -33,6 +33,8 @@
 #'   proportional to the size of each cluster?
 #' @param cex_text If `plotting = TRUE` and `scale_palette = FALSE`, size of
 #'   text to display on the color palette numbers.
+#' @param bin_avg Logical. Return the color centers as the average of the pixels
+#'   assigned to the bin (the default), or the geometric center of the bin?
 #'
 #' @return An object of S3 class `recolorize` with the following attributes:
 #' \enumerate{
@@ -45,7 +47,7 @@
 #' }
 #'
 #' @details
-#' Method for color clustering: \code{\link[stats]{kmeans}} clustering tries to
+#' Method for color clustering: [stats::kmeans()] clustering tries to
 #' find the set of `n` clusters that minimize overall distances. Histogram
 #' binning divides up color space according to set breaks; for example, bins = 2
 #' would divide the red, green, and blue channels into 2 bins each (> 0.5 and <
@@ -119,7 +121,7 @@
 #'
 #' graphics::par(current_par)
 #' @export
-recolorize <- function(img, method = "histogram",
+recolorize <- function(img, method = c("histogram", "kmeans"),
                        bins = 2, n = 5,
                        color_space = "sRGB", ref_white = "D65",
                        lower = NULL, upper = NULL,
@@ -127,10 +129,11 @@ recolorize <- function(img, method = "histogram",
                        resid = FALSE,
                        resize = NULL, rotate = NULL,
                        plotting = TRUE, horiz = TRUE,
-                       cex_text = 1.5, scale_palette = TRUE) {
+                       cex_text = 1.5, scale_palette = TRUE,
+                       bin_avg = TRUE) {
 
   # get method
-  method <- match.arg(tolower(method), c("kmeans", "histogram"))
+  method <- match.arg(method)
 
   # if 'img' is a filepath, read in image
   if (is.character(img)) {
@@ -161,7 +164,8 @@ recolorize <- function(img, method = "histogram",
   color_clusters <- colorClusters(bg_indexed, method = method,
                                   n = n, bins = bins,
                                   color_space = color_space,
-                                  ref_white = ref_white)
+                                  ref_white = ref_white,
+                                  bin_avg = bin_avg)
 
   # get sizes vector
   sizes <- color_clusters$sizes
@@ -169,6 +173,15 @@ recolorize <- function(img, method = "histogram",
 
   # returnables:
   original_img <- img
+
+  # add an alpha channel if there is none
+  if (!alpha_channel) {
+    a <- matrix(1, nrow = nrow(original_img), ncol = ncol(original_img))
+    if (length(bg_indexed$idx_flat != 0 )) {
+      a[bg_indexed$idx_flat] <- 0
+    }
+    original_img <- abind::abind(original_img, a)
+  }
 
   # return binning scheme
   method <- if( method == "kmeans" ) {

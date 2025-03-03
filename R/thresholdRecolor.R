@@ -23,12 +23,14 @@
 #' @return A `recolorize` object.
 #'
 #' @examples
+#' \donttest{
 #' img <- system.file("extdata/fulgidissima.png", package = "recolorize")
 #' init_fit <- recolorize(img, bins = 3)
 #' thresh_fit <- thresholdRecolor(init_fit, pct = 0.1)
 #'
 #' # if you take it too far, you just get one color back:
 #' thresh_fit_oops <- thresholdRecolor(init_fit, pct = 1)
+#' }
 #' @export
 thresholdRecolor <- function(recolorize_obj,
                               pct = 0.05,
@@ -85,9 +87,11 @@ thresholdRecolor <- function(recolorize_obj,
   }
 
   # append the call
-  recolorize_obj$call <- append(recolorize_obj$call, match.call())
+  new_call <- append(recolorize_obj$call, match.call())
+  refit$call <- new_call
 
   recolorize_obj <- refit
+
   return(recolorize_obj)
 
 }

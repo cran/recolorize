@@ -3,7 +3,7 @@
 #' Clusters all the pixels in an image according to the specified method and
 #' returns color centers, cluster assignments, and cluster sizes.
 #'
-#' @param bg_indexed A list returned by \code{\link{backgroundIndex}}.
+#' @param bg_indexed A list returned by [backgroundIndex()].
 #' @param method Binning scheme to use, one of either `kmeans` or `histogram`.
 #'   Produce very different results (see details).
 #' @param n If `method = "kmeans"`, the number of colors to fit.
@@ -11,10 +11,13 @@
 #'   channel (if a single number is provided) OR a vector of length 3 with the
 #'   number of bins for each channel.
 #' @param color_space Color space in which to cluster colors, passed to
-#'   \code{\link{grDevices}{convertColor}}. One of "sRGB", "Lab", or "Luv".
+#'   \code{[grDevices]{convertColor}}. One of "sRGB", "Lab", or "Luv".
 #'   Default is "Lab", a perceptually uniform (for humans) color space.
 #' @param ref_white Reference white for converting to different color spaces.
 #'   D65 (the default) corresponds to standard daylight.
+#' @param bin_avg Logical. Return the color centers as the average of the pixels
+#'   assigned to the bin (the default), or the geometric center of the bin?
+#'
 #'
 #' @return
 #' A list with the following elements:
@@ -26,7 +29,7 @@
 #' }
 #'
 #' @details
-#' \code{\link[stats]{kmeans}} clustering tries to find the set of `n` clusters
+#' [stats::kmeans()] clustering tries to find the set of `n` clusters
 #' that minimize overall distances. Histogram binning divides up color space
 #' according to set breaks; for example, bins = 2 would divide the red, green,
 #' and blue channels into 2 bins each (> 0.5 and < 0 .5), resulting in 8
@@ -69,14 +72,15 @@
 #'
 #' @export
 colorClusters <- function(bg_indexed,
-                          method = "histogram",
+                          method = c("histogram", "kmeans"),
                           n = 10,
                           bins = 3,
                           color_space = "Lab",
-                          ref_white = "D65") {
+                          ref_white = "D65",
+                          bin_avg = TRUE) {
 
   # coerce method argument
-  method <- match.arg(tolower(method), c("kmeans", "histogram"))
+  method <- match.arg(method)
 
   # use clustering function appropriate to specified method
   if (method == "kmeans") {
@@ -92,7 +96,8 @@ colorClusters <- function(bg_indexed,
     color_clusters <- colorClustersHist(pixel_matrix = bg_indexed$non_bg,
                                         bins = bins,
                                         color_space = color_space,
-                                        ref_white = ref_white)
+                                        ref_white = ref_white,
+                                        bin_avg = bin_avg)
     color_clusters$method <- "histogram"
 
   } else {
@@ -117,13 +122,13 @@ colorClusters <- function(bg_indexed,
 
 #' Cluster pixel colors using K-means clustering
 #'
-#' Clusters pixel colors using \code{\link[stats]{kmeans}}.
+#' Clusters pixel colors using [stats::kmeans()].
 #'
 #' @param pixel_matrix 2D matrix of pixels to classify (rows = pixels, columns =
 #'   channels).
 #' @param n Number of clusters to fit.
 #' @param color_space Color space in which to cluster colors, passed to
-#'   \code{\link{grDevices}{convertColor}}. One of "sRGB", "Lab", "Luv", or
+#'   \code{[grDevices]{convertColor}}. One of "sRGB", "Lab", "Luv", or
 #'   "XYZ". Default is "Lab", a perceptually uniform (for humans) color space.
 #' @param ref_white Reference white for converting to different color spaces.
 #'   D65 (the default) corresponds to standard daylight.
@@ -136,7 +141,7 @@ colorClusters <- function(bg_indexed,
 #'         \item `sizes`: The number of pixels assigned to each cluster.
 #' }
 #'
-#' @details Called by \code{\link{colorClusters}}. See that documentation for
+#' @details Called by [colorClusters()]. See that documentation for
 #'   examples.
 colorClustersKMeans <- function(pixel_matrix, n = 10,
                                 color_space = "Lab",
@@ -191,10 +196,12 @@ colorClustersKMeans <- function(pixel_matrix, n = 10,
 #'   will result in 2*2*3 = 12 bins (2 red, 2 green, 3 blue if you're in RGB
 #'   color space), etc.
 #' @param color_space Color space in which to cluster colors, passed to
-#'   \code{\link{grDevices}{convertColor}}. One of "sRGB", "Lab", or "Luv".
+#'   \code{[grDevices]{convertColor}}. One of "sRGB", "Lab", or "Luv".
 #'   Default is "Lab", a perceptually uniform (for humans) color space.
 #' @param ref_white Reference white for converting to different color spaces.
 #'   D65 (the default) corresponds to standard daylight.
+#' @param bin_avg Logical. Return the color centers as the average of the pixels
+#'   assigned to the bin (the default), or the geometric center of the bin?
 #'
 #' @return
 #' A list with the following elements:
@@ -205,18 +212,19 @@ colorClustersKMeans <- function(pixel_matrix, n = 10,
 #'         \item `sizes`: The number of pixels assigned to each cluster.
 #' }
 #'
-#' @details Called by \code{\link{colorClusters}}. See that documentation for
+#' @details Called by [colorClusters()]. See that documentation for
 #'   examples.
 colorClustersHist <- function(pixel_matrix,
                               bins = 3,
-                              color_space = "Lab",
-                              ref_white = "D65") {
+                              color_space = c("Lab", "sRGB", "Luv", "HSV"),
+                              ref_white = "D65",
+                              bin_avg = TRUE) {
 
   # make sure bins is either a number or a vector of length 3
   stopifnot(length(bins) == 1 | 3)
 
   # match argument for color space
-  color_space <- match.arg(color_space, c("sRGB", "Lab", "Luv", "HSV"))
+  color_space <- match.arg(color_space)
 
   # first, convert to color space for clustering:
   pm <- col2col(pixel_matrix,
@@ -286,28 +294,40 @@ colorClustersHist <- function(pixel_matrix,
   colnames(centers) <- strsplit(gsub("s", "", color_space), "")[[1]]
 
   # how many pixels in each bin?
-  d <- mgcv::uniquecombs(binned_image)
+  d <- mgcv::uniquecombs(binned_image, ordered = TRUE)
 
   # which bin does each pixel go in?
   pixel_assignments <- attr(d, "index")
+  pixel_assignments_2 <- rep(0, length(pixel_assignments))
 
   # make a vector for sizes
   sizes <- rep(0, prod(bins))
 
+  # for matching
+  bin_names <- apply(possible_bins, 1,
+                     \(x) paste0(x, collapse = ""))
+
   # for every color center...
   for (j in 1:dim(d)[1]) {
+
+    # match to possible_bins bin
+    bin_idx <- match(paste0(d[j, ], collapse = ""),
+          bin_names)
 
     # extract all the pixels in that bin
     pix_temp <- pm[which(pixel_assignments == j), ]
 
+    pixel_assignments_2[which(pixel_assignments == j)] <- bin_idx
+
     # if more than one pixel, use the average
     if (is.matrix(pix_temp)) {
-      centers[j, 1:3] <- colMeans(pix_temp)
-      sizes[j] <- nrow(pix_temp)
+      if (bin_avg) { centers[bin_idx, 1:3] <- colMeans(pix_temp) }
+      sizes[bin_idx] <- nrow(pix_temp)
     } else {
-      centers[j, 1:3] <- pix_temp
-      sizes[j] <- 1
+      if (bin_avg) { centers[bin_idx, 1:3] <- pix_temp }
+      sizes[bin_idx] <- 1
     }
+
   }
 
   # convert centers
@@ -317,7 +337,7 @@ colorClustersHist <- function(pixel_matrix,
                      ref_white = ref_white)
 
   # return pixel assignments and centers
-  return(list(pixel_assignments = pixel_assignments,
+  return(list(pixel_assignments = pixel_assignments_2,
               centers = centers,
               sizes = sizes))
 
@@ -337,13 +357,13 @@ colorClustersHist <- function(pixel_matrix,
 #'
 #' @details As my mother used to say: good enough for government work.
 col2col <- function(pixel_matrix,
-                               from = "sRGB",
-                               to = "sRGB",
+                               from = c("sRGB", "Lab", "Luv", "HSV"),
+                               to = c("sRGB", "Lab", "Luv", "HSV"),
                             ref_white = "D65") {
 
   # match color space args
-  from_color_space <- match.arg(from, c("sRGB", "Lab", "Luv", "HSV"))
-  to_color_space <- match.arg(to, c("sRGB", "Lab", "Luv", "HSV"))
+  from_color_space <- match.arg(from)
+  to_color_space <- match.arg(to)
 
   # if HSV is not in site, we can use convertColor
   if (from_color_space != "HSV" & to_color_space != "HSV") {

@@ -24,7 +24,7 @@ imposeColors(
 }
 \arguments{
 \item{img}{Path to the image (a character vector) or a 3D image array as read
-in by \code{\link[png]{readPNG}} \code{{readImage}}.}
+in by \code{\link[png:readPNG]{png::readPNG()}} \code{{readImage}}.}
 
 \item{centers}{Colors to map to, as an n x 3 matrix (rows = colors,
 columns = channels).}
@@ -99,6 +99,7 @@ distinguishable features of interest should still take up at least 2 pixels
 }
 \examples{
 
+\donttest{
 # RGB extremes (white, black, red, green, blue, yellow, magenta, cyan)
 ctrs <- matrix(c(1, 1, 1,
                  0, 0, 0,
@@ -134,5 +135,5 @@ fulgidissima <- system.file("extdata/fulgidissima.png",
 fulgidissma_ocellata <- recolorize::imposeColors(fulgidissima,
                        ocellata_colors$centers,
                        adjust_centers = FALSE)
-
+}
 }

@@ -8,13 +8,14 @@ mergeLayers(
   recolorize_obj,
   merge_list = NULL,
   color_to = "weighted average",
-  plotting = TRUE
+  plotting = TRUE,
+  remove_empty_centers = FALSE
 )
 }
 \arguments{
 \item{recolorize_obj}{An object of class "recolorize", such as from
-\code{\link{recolorize}}, \code{\link{recluster}}, or
-\code{\link{imposeColors}}.}
+\code{\link[=recolorize]{recolorize()}}, \code{\link[=recluster]{recluster()}}, or
+\code{\link[=imposeColors]{imposeColors()}}.}
 
 \item{merge_list}{A list of numeric vectors specifying which layers
 to merge. Layers not included in this list are unchanged. See examples.}
@@ -23,6 +24,9 @@ to merge. Layers not included in this list are unchanged. See examples.}
 
 \item{plotting}{Logical. Plot the results of the layer merging next
 to the original color fit for comparison?}
+
+\item{remove_empty_centers}{Logical. Remove empty centers with size = 0?
+Retaining empty color centers can be helpful when batch processing.}
 }
 \value{
 A \code{recolorize} class object with merged layers. The order of the returned
@@ -36,7 +40,7 @@ order and in terms of the original layers: 1, 2, 3, 6, 4 & 5 (merged), 7 & 8
 Merges specified layers in a recolorized image. This is a good option if you
 want to manually specify which layers to merge (and what color to make the
 resulting merged layer); it's also called on by other \code{recolorize} functions
-like \code{\link{recluster}} to merge layers that have been identified
+like \code{\link[=recluster]{recluster()}} to merge layers that have been identified
 as highly similar in color using a given distance metric.
 }
 \details{

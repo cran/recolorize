@@ -1,5 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
+  dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -7,7 +8,7 @@ knitr::opts_chunk$set(
   strip.white = TRUE
 )
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 
@@ -22,7 +23,7 @@ recluster_results <- recluster(init_fit,
 recluster_rgb <- recluster(init_fit, color_space = "sRGB",
                            cutoff = 0.5)
 
-## ---- fig.width = 5-----------------------------------------------------------
+## ----fig.width = 5------------------------------------------------------------
 # let's use a different image:
 img <- system.file("extdata/chongi.png", package = "recolorize")
 
@@ -31,9 +32,9 @@ img <- system.file("extdata/chongi.png", package = "recolorize")
 # fit2 <- recluster(fit1, cutoff = 50)
 chongi_fit <- recolorize2(img, bins = 3, cutoff = 45)
 
-## ---- fig.width=5-------------------------------------------------------------
+## ----fig.width=5--------------------------------------------------------------
 chongi_threshold <- thresholdRecolor(chongi_fit, pct = 0.1)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

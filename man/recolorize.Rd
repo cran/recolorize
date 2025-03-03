@@ -6,7 +6,7 @@
 \usage{
 recolorize(
   img,
-  method = "histogram",
+  method = c("histogram", "kmeans"),
   bins = 2,
   n = 5,
   color_space = "sRGB",
@@ -20,12 +20,13 @@ recolorize(
   plotting = TRUE,
   horiz = TRUE,
   cex_text = 1.5,
-  scale_palette = TRUE
+  scale_palette = TRUE,
+  bin_avg = TRUE
 )
 }
 \arguments{
 \item{img}{Path to the image (a character vector) or a 3D image array as read
-in by \code{\link[png]{readPNG}} \code{{readImage}}.}
+in by \code{\link[png:readPNG]{png::readPNG()}} \code{{readImage}}.}
 
 \item{method}{Method for clustering image colors. One of either \code{histogram}
 or \code{kmeans}. See details.}
@@ -37,7 +38,7 @@ number of bins for each channel.}
 \item{n}{If \code{method = "kmeans"}, the number of color clusters to fit.}
 
 \item{color_space}{Color space in which to minimize distances, passed to
-\code{\link{grDevices}{convertColor}}. One of "sRGB", "Lab", or "Luv".
+\code{[grDevices]{convertColor}}. One of "sRGB", "Lab", or "Luv".
 Default is "Lab", a perceptually uniform (for humans) color space.}
 
 \item{ref_white}{Reference white for converting to different color spaces.
@@ -67,6 +68,9 @@ text to display on the color palette numbers.}
 
 \item{scale_palette}{Logical. If plotting, plot colors in the color palette
 proportional to the size of each cluster?}
+
+\item{bin_avg}{Logical. Return the color centers as the average of the pixels
+assigned to the bin (the default), or the geometric center of the bin?}
 }
 \value{
 An object of S3 class \code{recolorize} with the following attributes:
@@ -84,7 +88,7 @@ Clusters the colors in an RGB image according to a specified method,
 then recolors that image to the simplified color scheme.
 }
 \details{
-Method for color clustering: \code{\link[stats]{kmeans}} clustering tries to
+Method for color clustering: \code{\link[stats:kmeans]{stats::kmeans()}} clustering tries to
 find the set of \code{n} clusters that minimize overall distances. Histogram
 binning divides up color space according to set breaks; for example, bins = 2
 would divide the red, green, and blue channels into 2 bins each (> 0.5 and <

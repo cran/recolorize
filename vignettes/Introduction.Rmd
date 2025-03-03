@@ -10,7 +10,7 @@ vignette: >
 ## `recolorize`: color-based image segmentation (for people with other things to do)
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
+knitr::opts_chunk$set(dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -37,7 +37,7 @@ par(mar = rep(0, 4))
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 img <- system.file("extdata/corbetti.png", package = "recolorize")
-rc <- suppressMessages(recolorize2(img, 
+rc <- suppressMessages(recolorize2(img,
                                   cutoff = 45, plotting = FALSE))
 v <- system.file("extdata/msc/corbetti_vector.rds", package = "recolorize")
 v <- readRDS(v)
@@ -48,7 +48,7 @@ title("Original    ", line = 1, font.main = 1, cex.main = 1.2)
 plotImageArray(recoloredImage(rc))
 title("Color map (bitmap)    ", line = 1, font.main = 1, cex.main = 1.2)
 par(mar = c(1, 1, 3, 1))
-plot(v)
+# plot(v)
 title("Color map (vector)", font.main = 1, cex.main = 1.2)
 plotColorPalette(rc$centers, rc$sizes, horiz = F)
 rm(v, rc)
@@ -90,10 +90,11 @@ If something is unclear or you find a bug, please get in touch or [file an issue
 
 The basic `recolorize` workflow is initial clustering step -> refinement step -> manual tweaks. 
 
-1. Images should first be color-corrected and have any background masked out, ideally with transparency, as in the image above, for example (*Chrysochroa corbetti*, taken by [Nathan P. Lord](https://www.thelordlab.com/), used with permission and egregiously downsampled to ~250x150 pixels by me). 
+1. Images should first be color-corrected and have any background masked out, ideally with transparency, as in the image above, for example (*Chrysochroa corbetti*, taken by Nathan P. Lord, used with permission and egregiously downsampled to ~250x150 pixels by me). 
 
 2. In the initial clustering step, we bin all of the pixels into a smaller number of clusters, but still more than we expect to end up with at the end. In this case, we'll end up with 8 clusters ($2^3$):
 ```{r, fig.width=4}
+library(recolorize)
 init_fit <- recolorize(img, method = "hist", bins = 2, 
                        color_space = "sRGB")
 ```
@@ -113,7 +114,7 @@ final_fit <- editLayer(refined_fit, 3,
                         operation = "fill", px_size = 4)
 ```
 
-5. Once you have a color map you're happy with, you can export to a variety of formats. For instance, if I wanted to run Endler's [adjacency and boundary strength analysis](https://rdrr.io/cran/pavo/man/adjacent.html) in the `pavo` package, using human perception:
+5. Once you have a color map you're happy with, you can export to a variety of formats. For instance, if I wanted to run Endler's [adjacency and boundary strength analysis](https://www.rdocumentation.org/packages/pavo/versions/2.9.0/topics/adjacent) in the `pavo` package, using human perception:
 
 ```{r}
 adj <- recolorize_adjacency(final_fit, coldist = "default", hsl = "default")

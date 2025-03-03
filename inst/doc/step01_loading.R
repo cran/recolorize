@@ -1,5 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
+  dpi = 60,
   collapse = TRUE,
   comment = "#>", 
   fig.align = "center",
@@ -7,7 +8,7 @@ knitr::opts_chunk$set(
   strip.white = TRUE
 )
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 library(recolorize)
 current_par <- graphics::par(no.readonly = TRUE)
 
@@ -36,6 +37,6 @@ plotImageArray(img[ , , 4], main = "Alpha channel")
 blurred_img <- blurImage(img, blur_function = "blur_anisotropic",
                          amplitude = 10, sharpness = 0.2)
 
-## ---- echo=F------------------------------------------------------------------
+## ----echo=F-------------------------------------------------------------------
 graphics::par(current_par)
 

@@ -3,18 +3,19 @@
 #'  Merges specified layers in a recolorized image. This is a good option if you
 #'  want to manually specify which layers to merge (and what color to make the
 #'  resulting merged layer); it's also called on by other `recolorize` functions
-#'  like \code{\link{recluster}} to merge layers that have been identified
+#'  like [recluster()] to merge layers that have been identified
 #'  as highly similar in color using a given distance metric.
 #'
 #' @param recolorize_obj An object of class "recolorize", such as from
-#'   \code{\link{recolorize}}, \code{\link{recluster}}, or
-#'   \code{\link{imposeColors}}.
+#'   [recolorize()], [recluster()], or
+#'   [imposeColors()].
 #' @param merge_list A list of numeric vectors specifying which layers
 #'   to merge. Layers not included in this list are unchanged. See examples.
 #' @param color_to Color(s) for the merged layers. See examples.
 #' @param plotting Logical. Plot the results of the layer merging next
 #'   to the original color fit for comparison?
-#'
+#' @param remove_empty_centers Logical. Remove empty centers with size = 0?
+#'   Retaining empty color centers can be helpful when batch processing.
 #'
 #' @return
 #' A `recolorize` class object with merged layers. The order of the returned
@@ -88,7 +89,8 @@
 mergeLayers <- function(recolorize_obj,
                         merge_list = NULL,
                         color_to = "weighted average",
-                        plotting = TRUE) {
+                        plotting = TRUE,
+                        remove_empty_centers = FALSE) {
 
   # check parameters
   pm <- clean_merge_params(recolorize_obj,
@@ -175,10 +177,21 @@ mergeLayers <- function(recolorize_obj,
   # thbbt
   rownames(new_centers) <- NULL
 
-  # remove any stray empty things
+  # remove any stray empties
+  if(remove_empty_centers) {
   if (any(new_sizes == 0)) {
-    new_centers <- new_centers[-which(new_sizes == 0), ]
-    new_sizes <- new_sizes[-which(new_sizes == 0)]
+    zero_idx <- which(new_sizes == 0)
+
+    new_px_idx <- 1:nrow(new_centers)
+    new_px_idx[-zero_idx] <- 1:length(new_px_idx[-zero_idx])
+    new_px_idx[zero_idx] <- NA
+
+    for (i in 1:nrow(new_centers)) {
+      px_assign[px_assign == i] <- new_px_idx[i]
+    }
+    new_centers <- new_centers[-zero_idx, ]
+    new_sizes <- new_sizes[-zero_idx]
+  }
   }
 
   # reconstruct the recolorize obj
@@ -235,7 +248,7 @@ clean_merge_params <- function(recolorize_obj,
                          color_to) {
 
   # check if recolorize_obj is a correct class
-  if (class(recolorize_obj) != "recolorize") {
+  if (!inherits(recolorize_obj, "recolorize")) {
     stop("Must provide an object of class 'recolorize', as output
          by recolorize(), recluster(), or imposeColors()")
   }
